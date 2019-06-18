@@ -1,0 +1,14 @@
+*.tsv
+*.csv
+*.bak
+*.old
+*.swp
+*.pyc
+*.gz
+*.mgz
+*.tar
+*.tar.gz
+*.tgz
+.DS_Store
+credentials.json
+*.DS_Store
