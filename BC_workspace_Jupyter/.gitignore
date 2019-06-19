@@ -1,4 +1,6 @@
+.ipynb_checkpoints/
 freesurfer/
+JupyterWithOutput/
 results/
 *.tsv
 *.csv
