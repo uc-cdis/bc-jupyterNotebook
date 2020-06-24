@@ -1,0 +1,23 @@
+ 
+Looking for subjects with LLatVent volumes outside of 166.638:14905.2
+Looking for subjects with RLatVent volumes outside of -1205.64:16124.9
+subj10228 has a RLatVent of 16201.6, this volume is high
+subj10707 has a RLatVent of 18757.4, this volume is high
+Looking for subjects with Lthal volumes outside of 5829.12:9742.75
+Looking for subjects with Rthal volumes outside of 6007.48:9205.24
+subj10707 has a Rthal of 9946.7, this volume is high
+Looking for subjects with Lcaud volumes outside of 2550.87:4808.03
+Looking for subjects with Rcaud volumes outside of 2614.73:4891.13
+Looking for subjects with Lput volumes outside of 3965.64:6393.77
+Looking for subjects with Rput volumes outside of 3840.97:6337.09
+Looking for subjects with Lpal volumes outside of 1515.67:2614.43
+Looking for subjects with Rpal volumes outside of 1441.94:2441.31
+Looking for subjects with Lhippo volumes outside of 3205.66:4756.59
+Looking for subjects with Rhippo volumes outside of 3070.41:5023.25
+Looking for subjects with Lamyg volumes outside of 1113.35:1974
+subj10225 has a Lamyg of 2015.8, this volume is high
+Looking for subjects with Ramyg volumes outside of 1144.74:2165.96
+Looking for subjects with Laccumb volumes outside of 375.039:774.078
+Looking for subjects with Raccumb volumes outside of 363.534:750.474
+subj10193 has a Raccumb of 758.9, this volume is high
+Looking for subjects with ICV volumes outside of 1.20204e+06:1.94187e+06
