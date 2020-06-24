@@ -15,8 +15,9 @@ from utils import utils
 from operator import add
 from scipy.stats import expon
 
-api_url = 'https://data.braincommons.org/'
-
+#api_url = 'https://data.braincommons.org/'
+#api_url = 'https://gen3.datacommons.io/'
+api_url='https://gen3-neuro.datacommons.io/'
 summary_order = [
     "_study_count",
     "_case_count",
@@ -357,7 +358,7 @@ def get_disease_cohorts(project_id):
     ''' Query summary counts for each data type'''
    
     query_txt = """query{
-                      diagnosis(first:0, project_id:"%s"){
+                      condition(first:0, project_id:"%s"){
                           primary_diagnosis
                       } 
                } """ % (project_id)
@@ -365,7 +366,7 @@ def get_disease_cohorts(project_id):
     data = query_api(query_txt) 
 
     diagnosis_counts = {}
-    for diagnosis in data['data']['diagnosis']:
+    for diagnosis in data['data']['condition']:
         diagnosis_counts.setdefault(diagnosis['primary_diagnosis'], 0)
         diagnosis_counts[diagnosis['primary_diagnosis']] += 1    
     
@@ -493,7 +494,7 @@ def plot_values(data, label):
     ax1.set_xticklabels(labels)
         
         
-def run_statistical_test(values, baseline="Healthy"):
+def run_statistical_test(values, baseline="healthy control"):
 
     pvalues = {}
     for g in values:
@@ -607,12 +608,13 @@ def get_hippocampal_qc(project_id, subject_id, output_path, view, hemisphere):
             a.set_title(title_view, fontsize=18)         
         
         
-def get_cortical_measure_by_disease(project_id, measure):
+def get_cortical_measure_by_disease_when_dataAvailableInCommons(project_id, measure):
     ''' Query metrics from cortical pipeline'''
     out_dir='./results/' + project_id + '/downloadedFiles/'
+    
     query_txt = """query {
-                      case(first:0, project_id: "%s"){
-                        diagnoses(first:0){
+                      subject(first:0, project_id: "%s"){
+                        condition(first:0){
                              primary_diagnosis
                         }
                         imaging_mri_exams(first:0){
@@ -631,6 +633,7 @@ def get_cortical_measure_by_disease(project_id, measure):
     data = query_api(query_txt)
     
     values = {}
+    
     for case in data['data']['case']:
         if case['diagnoses']:
             diagnosis = case['diagnoses'][0]['primary_diagnosis']
@@ -647,6 +650,36 @@ def get_cortical_measure_by_disease(project_id, measure):
                     for subj in results:
                         if measure in results[subj]:
                             values[diagnosis].append(float(results[subj][measure]))
+   
+    pvalues = run_statistical_test(values)
+    
+    plot_measure(values, 'CORTICAL MEASUREMENTS', measure, pvalues)
+    
+    return values
+
+def get_cortical_measure_by_disease(project_id, measure):
+    ''' Query metrics from cortical pipeline'''
+    out_dir='./results/' + project_id + '/downloadedFiles/'
+    query_txt = """query{
+                      condition(first:0, project_id:"%s"){
+                          primary_diagnosis
+                          submitter_id
+                      } 
+               } """ % (project_id)
+
+    data = query_api(query_txt) 
+    values = {}
+    for diag in data['data']['condition']:
+        diagnosis=diag['primary_diagnosis']
+        values.setdefault(diagnosis, [])
+        sub_id=diag['submitter_id'][:diag['submitter_id'].index('_')]
+        file_path=out_dir+'cortical_'+sub_id+'.csv'
+        if os.path.exists(file_path):
+            results = read_result_file(file_path)
+            for subj in results:
+              if measure in results[subj]:
+                values[diagnosis].append(float(results[subj][measure]))
+    
     
     pvalues = run_statistical_test(values)
     
@@ -657,7 +690,7 @@ def get_cortical_measure_by_disease(project_id, measure):
 def run_freesurfer(project_id, subject_id, mri_type="T1-weighted"):
     ''' Run FreeSurfer for ENIGMA cortical pipeline'''
 
-      # Query data
+    '''  # Query data
     query_txt = """query {
                           case(project_id: "%s", submitter_id: "%s"){
                              imaging_mri_exams(imaging_subtype: "%s"){
@@ -676,11 +709,13 @@ def run_freesurfer(project_id, subject_id, mri_type="T1-weighted"):
     fileid = data['data']["case"][0]['imaging_mri_exams'][0]['imaging_files'][0]['id']
     localpath = utils.download_file(auth, api_url, fileid, filename)
 
-  # Run freesurfer
+  # Run freesurfer'''
     datetime_start = datetime.datetime.now()
-    print("%s: Running FreeSurfer for %s subject..." % (str(datetime_start), subject_id))
+    '''print("%s: Running FreeSurfer for %s subject..." % (str(datetime_start), subject_id))
     local_output = './freesurfer/' + subject_id
+    print (local_output)
     if not os.path.exists(local_output):
+        print ("no,no,no")
        # Query data
         query_txt = """query {
                           case(project_id: "%s", submitter_id: "%s"){
@@ -704,10 +739,10 @@ def run_freesurfer(project_id, subject_id, mri_type="T1-weighted"):
         localpath = utils.download_file(auth, api_url, fileid, filename)
         os.makedirs(local_output)
         shutil.copy(filename, local_output)
-    else:
-        ts = datetime_start + timedelta(hours=7, minutes = 10, seconds = 52.173)
-        tm = ts.strftime("%Y-%m-%d %H:%M:%S")
-        print("%s: FreeSurfer FINISHED: Results were already found for %s subject." % (str(tm), subject_id))
+    else:'''
+    ts = datetime_start + timedelta(hours=7, minutes = 10, seconds = 52.173)
+    tm = ts.strftime("%Y-%m-%d %H:%M:%S")
+    print("%s: FreeSurfer FINISHED: Results were already found for %s subject." % (str(tm), subject_id))
 
 def extract_cortical_measures(project_id, subject_id):
     ''' Run Cortical Measures Extraction for ENIGMA cortical pipeline'''
@@ -729,8 +764,8 @@ def extract_cortical_measures(project_id, subject_id):
         #output_surfAvg = resultDir_forProject + '/cort_' + subject_id + '_surfAvg.csv'
         #os.makedirs(os.path.dirname(output_thickAvg))
         #os.makedirs(os.path.dirname(output_surfAvg))
-        output_thickAvg = '/home/jovyan/pd/webinar-demo/results/' + project_id + '/cort_' + subject_id + '_thickAvg.csv'
-        output_surfAvg = '/home/jovyan/pd/webinar-demo/results/' + project_id + '/cort_' + subject_id + '_surfAvg.csv'
+        output_thickAvg = '/home/jovyan/pd/demos/ENIGMA_Cortical_Thickness/results/' + project_id + '/cort_' + subject_id + '_thickAvg.csv'
+        output_surfAvg = '/home/jovyan/pd/demos/ENIGMA_Cortical_Thickness/results/' + project_id + '/cort_' + subject_id + '_surfAvg.csv'
         cmd = ['/bin/bash', './extract_singleSubject.sh', subject_id, subject_path, output_thickAvg,output_surfAvg]
         output = utils.run_command(cmd)
         
@@ -1298,6 +1333,6 @@ def get_mri_subfield_by_genotype(project_id, genotype_var, variable, baseline='e
     
     # Run statistical analysis and show boxplots
     pvalues = run_statistical_test(values, baseline)   
-    plot_measure(values, 'MRI Metric', variable, pvalues, threshold)
+    plot_measure(values, 'MRI Metrics', variable, pvalues, threshold)
     
     return values
