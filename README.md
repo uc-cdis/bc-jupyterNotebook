@@ -12,8 +12,15 @@ ENIGMA_subcortical_volume
 1. MRI image preprocessing using FreeSurfer
 2. Extract volume sizes of subcortical subfields from FreeSurfer result
 3. Outlier detection
-3. Quality contral visualization
+4. Quality contral visualization
 
+ENIGMA_Hippocampal_Subfield
+1. MRI image preprocessing and hippocampal subfield segmentation using seFreeSurfer
+2. Extract volume sizes of hippocampal subfields from FreeSurfer result
+3. Outlier detection
+4. Quality contral visualization
+5. Scatter plots on 12 subfields (left vs right)
+6. Analysis on individual subfield
 
 MJFF
 1. Basic statistics on PPMI data
